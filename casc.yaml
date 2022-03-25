@@ -1,0 +1,52 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n"
+  numExecutors: 5
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: ${JENKINS_ADMIN_ID:-admin}
+          password: ${JENKINS_ADMIN_PASSWORD:-passw0rd}
+          
+  authorizationStrategy:
+    globalMatrix:
+      grantedPermissions:
+        - "Overall/Read:anonymous"
+        - "Job/Read:anonymous"
+        - "View/Read:anonymous"
+        - "Overall/Administer:anonymous"
+unclassified:
+  location:
+    url: http://127.0.0.1:8080/
+
+globalLibraries:
+  libraries:
+    - name: "shared@master"
+      implicit: true
+      defaultVersion: "2.0.0"
+      retriever:
+        modernSCM:
+          scm:
+            git:
+              remote: "https://github.com/navapbc/jenkins-shared-library.git"
+
+tool:
+  git:
+    installations:
+      - name: git
+        home: /usr/local/bin/git
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: ssh_with_passphrase_provided
+              username: ssh_root
+              passphrase: ${SSH_KEY_PASSWORD}
+              description: "SSH passphrase with private key file. Private key provided"
+              privateKeySource:
+                directEntry:
+                  privateKey: ${SSH_PRIVATE_KEY}
+
