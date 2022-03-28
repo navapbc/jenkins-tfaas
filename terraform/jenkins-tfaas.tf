@@ -17,31 +17,70 @@ terraform {
 }
 
 locals {
-  steps = tomap({
-    "test" = {
-      name: "test",
-      folder_id: jenkins_folder.test.id
-      trigger_xml: ""
-    },
-    "prod" = {
-    name: "prod",
-    folder_id: jenkins_folder.infrastructure.id
-      trigger_xml: ""
-    }
-  })
+  tfaas = yamldecode(file("jenkins-tfaas.yaml"))
+  # steps = tomap({
+  #   "test" = {
+  #     name: "test",
+  #     folder_id: jenkins_folder.test.id
+  #     trigger_xml: ""
+  #   },
+  #   "prod" = {
+  #   name: "prod",
+  #   folder_id: jenkins_folder.infrastructure.id
+  #     trigger_xml: ""
+  #   }
+  # })
+  flattened_jobs = flatten([
+    for service_key, service in local.tfaas.services : [
+      for env_key, env in service.environments : [
+        for region, tfvars in env : {
+          service_key = service_key
+          env_key     = env_key
+          region      = region
+          tfvarsfile  = tfvars
+          module_path = service.module_path
+        }   
+      ]
+    ]
+  ])
 }
 
-resource "jenkins_folder" "test" {
-  name        = "test"
+resource "jenkins_folder" "tfaas" {
+  name        = "tfaas"
 }
 
-resource "jenkins_folder" "infrastructure" {
-  name        = "infrastructure"
+resource "jenkins_folder" "tfaas_services" {
+  name        = "services"
+  folder      = jenkins_folder.tfaas.id
 }
+
+resource "jenkins_folder" "services" {
+  for_each = local.tfaas.services
+  name     = each.key
+  folder   = jenkins_folder.tfaas_services.id
+}
+
+# resource "jenkins_folder" "environments" {
+#   for_each = {
+#     for job in local.flattened_jobs : "${job.env_key}_${job.region}" => job
+#   }
+#   name     = "${each.value.env_key}_${each.value.region}"
+#   folder   = jenkins_folder.services[each.value.service_key].id
+# }
 
 resource "jenkins_job" "these" {
-  for_each = local.steps
-  name     = "tf_job"
-  folder   = each.value.folder_id
-  template = templatefile("${path.module}/config.xml", { var: each.value})
+  for_each = {
+    for job in local.flattened_jobs : "${job.env_key}_${job.region}" => job
+  }
+  name     = "${each.value.env_key}_${each.value.region}"
+  folder   = jenkins_folder.services[each.value.service_key].id
+  template = templatefile("${path.module}/${each.value.module_path}/config.xml", { var: each.value})
+}
+
+
+resource "jenkins_credential_ssh" "sshgithub" {
+  name       = "sshgithub"
+  username   = "jcii"
+  privatekey = file("/home/jimmy/.ssh/id_ed25519")
+  passphrase = ""
 }

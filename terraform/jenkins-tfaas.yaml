@@ -1,0 +1,15 @@
+---
+services:
+  poc_service:
+    module_path: modules/poc_service
+    environments:
+    # using integers to avoid presentation issues for now
+      00-dev:
+        00-us-east-1: environments/dev/us-east-1/poc.tfvars
+        01-us-west-2: environments/dev/us-west-2/poc.tfvars
+      01-test:    
+        00-us-east-1: environments/test/us-east-1/poc.tfvars
+        01-us-west-2: environments/test/us-west-2/poc.tfvars
+      02-prod:
+        00-us-east-1: environments/test/us-east-1/poc.tfvars
+        01-us-west-2: environments/test/us-west-2/poc.tfvars
