@@ -1,4 +1,4 @@
-node {
+pipeline {
     stage('Preparation') { // for display purposes
         sh 'date'
 
