@@ -90,7 +90,7 @@
       <submoduleCfg class="empty-list"/>
       <extensions/>
     </scm>
-    <scriptPath>terraform/modules/poc_service/poc_service.groovy</scriptPath>
+    <scriptPath>terraform/modules/poc_service/poc_service.scripted.groovy</scriptPath>
     <lightweight>true</lightweight>
   </definition>
   <triggers/>

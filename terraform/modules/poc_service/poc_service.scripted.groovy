@@ -1,7 +1,6 @@
-pipeline {
+node {
     stage('Preparation') { // for display purposes
         sh 'date'
-
     }
     stage('Build') {
         sh 'date'
@@ -11,4 +10,3 @@ pipeline {
         sh 'date'
     }
 }
-

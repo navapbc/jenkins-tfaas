@@ -18,6 +18,8 @@ This implementation assumes the following terraform organization:
 docker-compose build
 docker-compose up
 cd terraform && terraform apply -auto-approve
+
+TODO: scipt adding github.com's ssh fingerprint to known_hosts
 ```
 
 ## Jenkins
