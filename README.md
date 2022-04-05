@@ -17,9 +17,12 @@ This implementation assumes the following terraform organization:
 ```
 docker-compose build
 docker-compose up
+export JENKINS_USERNAME=admin
+export JENKINS_PASSWORD=admin
+export JENKINS_URL=http://localhost:8080/
 cd terraform && terraform apply -auto-approve
 
-TODO: scipt adding github.com's ssh fingerprint to known_hosts
+TODO: script adding github.com's ssh fingerprint to known_hosts
 ```
 
 ## Jenkins
